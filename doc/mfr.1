@@ -1,0 +1,35 @@
+.TH MFR 1
+.SH NAME
+mfr \- multiple file renamer
+.SH SYNOPSIS
+.B mfr
+[\fB\-cdy\fR] 
+[\fB\-m\fR \fIMATCH-PATTERN\fR] 
+[\fB\-r\fR \fIREPLACE-PATTERN\fR]
+.IR FILE ...
+.SH DESCRIPTION
+.B mfr
+batch renames files using Lua patterns.
+.SH OPTIONS
+.TP
+.BR \-c ", " \-\-cautious
+Abort when an error is encountered, exiting with status 1.
+.TP
+.BR \-d ", " \-\-no\-dotfiles
+Do not process hidden files.
+.TP
+.BR \-m ", " \-\-match =\fIPATTERN\fR
+Lua pattern to match filenames against.
+.TP
+.BR \-r ", " \-\-replace =\fIPATTERN\fR
+Lua pattern to replace filenames with.
+.TP
+.BR \-s ", " \-\-source =\fIFILE\fR
+Match against lines from FILE instead of the original filenames.
+If no FILE is provided, match against lines from stdin.
+.SH EXAMPLES
+I didn't write any examples yet! HAHAHAHAHA
+.SH SEE ALSO
+.TP
+Lua pattern reference:
+<http://www.lua.org/manual/5.1/manual.html#5.4.1>
