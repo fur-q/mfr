@@ -1,19 +1,10 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 
-#define OH_NO(e) do { fprintf(stderr, "FATAL: %s\n", e); return 1; } while (0)
-
-int mfr_isfile(const char * path) {
-    struct stat buf;
-    int ok = lstat(path, &buf);
-    if (ok == -1) 
-        return -1;
-    return S_ISREG(buf.st_mode);
-}
+#define DIE(e) do { fprintf(stderr, "FATAL: %s\n", e); return 1; } while (0)
 
 int mfr_termwidth(void) {
     struct winsize w;
@@ -54,12 +45,12 @@ int l_traceback(lua_State * L) {
 int main(int argc, const char ** argv) {
     lua_State * L = luaL_newstate();
     if (!L) 
-        OH_NO("Error creating Lua state");
+        DIE("Error creating Lua state");
     luaL_openlibs(L);
     lua_pushcfunction(L, l_traceback);
     l_getargs(L, argc, argv);
-    if (l_require(L, "main"))
-        OH_NO(lua_tostring(L, -1));
+    if (l_require(L, "cli"))
+        DIE(lua_tostring(L, -1));
     lua_close(L);
     return 0;
 }

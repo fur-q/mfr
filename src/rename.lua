@@ -8,6 +8,7 @@ M.add = function(self, name)
     end
 end
 
+-- FIXME: preserve file extensions when matching against source
 M.match = function(self, match, replace)
     local count = 0
     for i, v in ipairs(self) do
@@ -15,7 +16,7 @@ M.match = function(self, match, replace)
         if self.source and not self.source[i] then
             break
         end
-        local old = self.source[i] or util.basename(v.path)
+        local old = self.source and self.source[i] or util.basename(v.path)
         local ok, new = pcall(string.gsub, old, match, replace)
         if not ok then -- pattern error
             return nil, new
@@ -49,8 +50,8 @@ M.rename = function(self, stop)
     return status
 end
 
-M.source = function(self, src)
-    if not type(src) == "string" then return end
+M.set_source = function(self, src)
+    if type(src) ~= "string" then return end
     self.source = {}
     for m in src:gmatch("[^\n]+") do
         self.source[#self.source+1] = m

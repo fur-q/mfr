@@ -1,6 +1,6 @@
 local optparse = require "optparse"
 local renamer  = require "rename"
-local util     = require "util"
+local util     = require "cliutil"
 
 local MFR_VERSION = "0.5.0"
 
@@ -27,7 +27,7 @@ if #args == 0 then
     parser:opterr("No filenames provided")
 end
 
-local match, replace, retry = opts.match, opts.replace
+local match, replace = opts.match, opts.replace
 
 local R = renamer(unpack(args))
 util.printf("%d files found.", #R)
@@ -37,7 +37,7 @@ end
 
 local source
 
-if opts.source == true then -- read from stdin
+if opts.source == true then -- no filename provided; read from stdin
     source = io.stdin:read("*a")
 elseif type(opts.source) == "string" then
     local f, err = io.open(opts.source)
@@ -49,7 +49,7 @@ elseif type(opts.source) == "string" then
     f:close()
 end
 
-R:source(source)
+R:set_source(source)
 
 -- TODO default to the last pattern used
 
