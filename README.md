@@ -2,7 +2,7 @@
 
 A batch file renamer which uses Lua patterns.
 
-# Installation
+## Installation
 
 You will need:
 
@@ -14,18 +14,19 @@ All other dependencies are bundled in `contrib/`.
 
 Run `make` for a release build or `make debug` for a debug build.
 
-# Usage
+## Usage
 
-`mfr --help` or `man mfr`.
+See `mfr --help` or `man mfr`.
 
-# License
+## License
 
 See LICENSE.
 
-# Credits
+## Credits
 
 `mfr` would not be nearly as good without [linenoise](https://github.com/antirez/linenoise) and lua-stdlib's [optparse.lua](https://github.com/lua-stdlib/lua-stdlib/blob/master/lib/std/optparse.lua). So, thanks!
 
-# To do
+## To do
 
-There are no tests, the manpage sucks and there is no install target in the makefile. Boo hoo.
+More comprehensive tests and a Makefile install target.
+
