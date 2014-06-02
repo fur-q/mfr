@@ -8,34 +8,47 @@ M.add = function(self, name)
     end
 end
 
--- FIXME: preserve file extensions when matching against source
-M.match = function(self, match, replace)
+M.match = function(self, match, replace, preserve)
     local count = 0
     for i, v in ipairs(self) do
         -- stop processing when no source lines are left
         if self.source and not self.source[i] then
-            break
+            self[i] = nil
+            goto skip
         end
-        local old = self.source and self.source[i] or util.basename(v.path)
-        local ok, new = pcall(string.gsub, old, match, replace)
+        local old = util.basename(v.path)
+        local ext
+        if preserve then
+            old, ext = old:match("^(.-)%f[.%z]%.?([^.]*)$") -- thx mniip
+        end
+        local src = self.source and self.source[i] or old
+        local ok, new = pcall(string.gsub, src, match, replace)
         if not ok then -- pattern error
             return nil, new
         end
         if old ~= new then
-            v.old, v.new = old, new
+            v.new, v.ext = new, ext
             count = count + 1
         else
-            v.old, v.new = nil, nil
+            v.new, v.ext = nil, nil
         end
+        ::skip::
     end
     return count
+end
+
+M.newpath = function(self, i)
+    local f = self[i]
+    if not f then
+        return
+    end
+    return util.join(util.dirname(f.path), f.new, f.ext)
 end
 
 M.rename = function(self, stop)
     local status = true
     for i, f in ipairs(self) do
-        local newpath = util.join(util.dirname(f.path), f.new)
-        local ok, err = os.rename(f.path, newpath)
+        local ok, err = os.rename(f.path, self:newpath(i))
         if ok then 
             goto skip
         end

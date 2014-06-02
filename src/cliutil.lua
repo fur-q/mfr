@@ -8,8 +8,6 @@ ffi.cdef [[
 
 local M = {}
 
--- these shouldn't really be here but who cares
-
 M.pluralise = function(count, word)
     if count ~= 1 and word:sub(#word, #word) ~= "s" then
         word = word .. "s"

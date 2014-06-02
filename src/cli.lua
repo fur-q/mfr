@@ -11,6 +11,7 @@ Usage: %s [OPTION]... [FILE]...
 Batch rename files using Lua patterns.
 
   -b, --break              stop processing after encountering an error
+  -e, --no-extensions      don't match against or modify file extensions
   -m, --match=[PATTERN]    set filename match pattern
   -r, --replace=[PATTERN]  set filename replacement pattern
   -s, --source=[FILE]      match against lines from FILE instead of filenames
@@ -56,7 +57,7 @@ R:set_source(source)
 local function preview()
     match = match or util.prompt("Enter match pattern: ")
     replace = replace or util.prompt("Enter replace pattern: ")
-    local count, err = R:match(match, replace)
+    local count, err = R:match(match, replace, opts["no-extensions"])
     if not count then
         util.printf("Pattern error: %s", err)
         return util.yesno("Retry?", true)

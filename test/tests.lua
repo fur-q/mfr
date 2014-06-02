@@ -78,9 +78,14 @@ end
 test.source = function()
     R:set_source("foo\nbar")
     local count, err = R:match("(.+)", "%1")
-   -- assert.equal(count, 2)
-    assert.equal(R[1].new, "foo.lua")
-    assert.equal(R[3].new, nil)
+    assert.equal(count, 2)
+    assert.equal(R[1].new, "foo")
+    assert.equal(R[3], nil)
+end
+
+test.preserve = function()
+    local count, err = R:match("(.+)", "%1", true)
+    assert.equal(R:newpath(1), "./foo.lua")
 end
 
 -- FIXME test break_on_error
@@ -93,6 +98,4 @@ test.rename_error = function()
     assert.equal(R:rename(), false)
 end
 
-test.show_locals = true
-test.show_upvals = true
 test()
