@@ -43,8 +43,9 @@ test.dirname = function()
 end
 
 test.join = function()
-    assert.equal(util.join(".", "foo", "bar"), "./foo.bar")
-    assert.equal(util.join(".", "foo.bar"), "./foo.bar")
+    assert.equal(util.join(".", "foo", "bar"), "foo.bar")
+    assert.equal(util.join(".", "foo"), "foo")
+    assert.equal(util.join("/", ".", "foo"), "./foo")
 end
 
 -- rename tests
@@ -91,7 +92,7 @@ end
 
 test.preserve = function()
     local count, err = R:match("(.+)", "%1", true)
-    assert.equal(R:newpath(1), "./foo.lua")
+    assert.equal(R[1].new, "foo.lua")
 end
 
 -- FIXME test break_on_error

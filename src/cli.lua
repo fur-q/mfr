@@ -56,9 +56,9 @@ local match, replace = opts.match, opts.replace
 local function preview()
     match = match or util.prompt("Enter match pattern: ")
     replace = replace or util.prompt("Enter replace pattern: ")
-    local count, err = R:match(match, replace, opts["no-extensions"])
+    local count, err = R:match(match, replace, opts.no_extensions)
     if count == 0 then
-        err = "Nothing to rename"
+        err = "Nothing to rename."
     end
     if err then
         print(err)

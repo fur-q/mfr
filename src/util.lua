@@ -26,12 +26,11 @@ M.is_file = function(path)
     return ffi.C.mfr_isfile(path) == 1 
 end
 
-M.join = function(path, name, ext)
-    if not path then
-        return name
+M.join = function(sep, p1, p2)
+    if not p2 then
+        return p1
     end
-    ext = ext and "." .. ext or ""
-    return path .. "/" .. name .. ext 
+    return p1 .. sep .. p2
 end
 
 return M

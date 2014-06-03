@@ -27,12 +27,13 @@ M.match = function(self, match, replace, preserve)
         if not ok then -- pattern error
             return nil, "Pattern error: " .. new
         end
+        new = util.join(".", new, ext)
         if old ~= new then
             if dupes[new] then
                 return nil, "Duplicate output filename: " .. new
             end
             dupes[new] = true
-            v.new, v.ext = new, ext
+            v.new = new
             count = count + 1
         else
             v.new, v.ext = nil, nil
@@ -42,18 +43,10 @@ M.match = function(self, match, replace, preserve)
     return count
 end
 
-M.newpath = function(self, i)
-    local f = self[i]
-    if not f then
-        return
-    end
-    return util.join(util.dirname(f.path), f.new, f.ext)
-end
-
 M.rename = function(self, stop)
     local status = true
     for i, f in ipairs(self) do
-        local ok, err = os.rename(f.path, self:newpath(i))
+        local ok, err = os.rename(f.path, util.join("/", util.dirname(f.path), f.new))
         if ok then 
             goto skip
         end
