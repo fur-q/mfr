@@ -10,6 +10,7 @@ end
 
 M.match = function(self, match, replace, preserve)
     local count = 0
+    local dupes = {}
     for i, v in ipairs(self) do
         -- stop processing when no source lines are left
         if self.source and not self.source[i] then
@@ -24,9 +25,13 @@ M.match = function(self, match, replace, preserve)
         local src = self.source and self.source[i] or old
         local ok, new = pcall(string.gsub, src, match, replace)
         if not ok then -- pattern error
-            return nil, new
+            return nil, "Pattern error: " .. new
         end
         if old ~= new then
+            if dupes[new] then
+                return nil, "Duplicate output filename: " .. new
+            end
+            dupes[new] = true
             v.new, v.ext = new, ext
             count = count + 1
         else

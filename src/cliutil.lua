@@ -1,4 +1,5 @@
-local ffi = require "ffi"
+local ffi  = require "ffi"
+local util = require "util"
 
 ffi.cdef [[
     void   free(void * p);
@@ -38,7 +39,7 @@ M.yesno = function(prompt, default)
     local ext = default == true and "Y/n" or "y/N"
     local out = M.promptf("%s (%s) ", prompt, ext)
     if default == true then 
-        return not not out:match("^[nN]")
+        return not out:match("^[nN]")
     end
     return not not out:match("^[yY]")
 end
@@ -63,8 +64,8 @@ M.preview = function(rn)
     M.printf(fmt, "Old name", "New name")
     print(string.rep("-", omax + nmax + 2))
     for k, v in ipairs(rn) do
-        if v.old then
-            M.printf(fmt, v.old, v.new)
+        if v.new then
+            M.printf(fmt, util.basename(v.path), v.new)
         end
     end
     print()

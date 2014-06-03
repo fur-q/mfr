@@ -13,7 +13,7 @@ Batch rename files using Lua patterns.
   -b, --break              stop processing after encountering an error
   -e, --no-extensions      don't match against or modify file extensions
   -m, --match=[PATTERN]    set filename match pattern
-  -r, --replace=[PATTERN]  set filename replacement pattern
+  -r, --replace=[STRING]   set filename replacement string
   -s, --source=[FILE]      match against lines from FILE instead of filenames
   -y, --yes                always answer yes at yes/no prompts
   -h, --help               show this help and exit
@@ -28,10 +28,7 @@ if #args == 0 then
     parser:opterr("No filenames provided")
 end
 
-local match, replace = opts.match, opts.replace
-
 local R = renamer(unpack(args))
-util.printf("%d files found.", #R)
 if #R == 0 then
     return 1
 end
@@ -54,27 +51,32 @@ R:set_source(source)
 
 -- TODO default to the last pattern used
 
+local match, replace = opts.match, opts.replace
+
 local function preview()
     match = match or util.prompt("Enter match pattern: ")
     replace = replace or util.prompt("Enter replace pattern: ")
     local count, err = R:match(match, replace, opts["no-extensions"])
-    if not count then
-        util.printf("Pattern error: %s", err)
-        return util.yesno("Retry?", true)
-    end
-    util.printf("Matched %d %s", util.pluralise(count, "file"))
     if count == 0 then
+        err = "Nothing to rename"
+    end
+    if err then
+        print(err)
         return util.yesno("Retry?", true)
     end
     if not opts.yes then
+        util.printf("Matched %d %s:", util.pluralise(count, "file"))
         util.preview(R) 
-        return util.yesno("OK to rename?") or nil
+        return (not util.yesno("OK to rename?")) or nil
     end
 end
 
 repeat
     ok = preview()
-    if ok == false then
+    if ok == true then -- retry
+        match, replace = nil, nil
+    end
+    if ok == false then -- quit
         return 1 
     end
 until ok == nil

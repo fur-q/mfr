@@ -34,8 +34,7 @@ int l_require(lua_State * L, const char * k) {
 }
 
 int l_traceback(lua_State * L) {
-    const char * msg;
-    msg = lua_tostring(L, 1);
+    const char * msg = lua_tostring(L, 1);
     if (!msg)
         return 0;
     luaL_traceback(L, L, msg, 1);

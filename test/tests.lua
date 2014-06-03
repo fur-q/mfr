@@ -43,7 +43,8 @@ test.dirname = function()
 end
 
 test.join = function()
-
+    assert.equal(util.join(".", "foo", "bar"), "./foo.bar")
+    assert.equal(util.join(".", "foo.bar"), "./foo.bar")
 end
 
 -- rename tests
@@ -73,6 +74,11 @@ end
 test.match_error = function()
     local count, err = R:match("[[[", "")
     assert.equal(count, nil)
+end
+
+test.dupe_error = function()
+    local count, err = R:match(".+", "foo")
+    assert.equal(err, "Duplicate output filename: foo")
 end
 
 test.source = function()

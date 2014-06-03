@@ -1,67 +1,47 @@
-= MFR(1)
-:doctype: manpage
+NAME
+  mfr - multiple file renamer
+SYNOPSIS
+  mfr [-bey] [-m MATCH-PATTERN] [-r REPLACE-STRING] [-s SOURCE-FILE] FILE...
+DESCRIPTION
+  mfr batch renames files using Lua patterns.
 
-== NAME
-mfr - multiple file renamer
+Replacement filenames may be derived from the original filenames, from
+  lines in a text file specified by --source, or from standard input.
+OPTIONS
 
-== SYNOPSIS
-*mfr* [-by] [-m MATCH-PATTERN] [-r REPLACE-STRING] [-s SOURCE-FILE] FILE...
-
-== DESCRIPTION
-*mfr* batch renames files using Lua patterns. 
-
-Replacement filenames may be derived from the original filenames, from lines in a text file specified by *--source*, or from standard input.
-
-== OPTIONS
-
-*-b, --break*::
+  -b, --break
     Abort when an error is encountered, exiting with status 1.
-
-*-e, --no-extensions*::
+  
+  -e, --no-extensions
     Do not match against, or modify, file extensions.
-
-*-m, --match*=PATTERN::
-    A Lua pattern to match the provided filenames against.
-
-    Will be prompted for interactively if not provided.
-
-*-r, --replace*=STRING::
-    A string to replace the match pattern with in the provided filenames.
-
-    Will be prompted for interactively if not provided.
-
-*-s, --source*=FILE::
-    Match against lines from FILE instead of the original filenames.
-
-    If --source is provided with no argument, match against lines from stdin.
-
-*-y, --yes*::
+  
+  -m, --match=PATTERN
+    A Lua pattern to match the provided filenames against. Will be prompted for interactively if not provided.
+  
+  -r, --replace=STRING
+    A string to replace the match pattern with in the provided filenames. Will be prompted for interactively if not provided.
+  
+  -s, --source=FILE
+    Match against lines from FILE instead of the original filenames. If --source is provided with no argument, match against lines from stdin.
+  
+  -y, --yes
     Always answer "yes" at yes/no prompts.
-
-== EXIT STATUS
-
-*0*::
+EXIT STATUS
+  0
     All files were renamed correctly.
-    
-*1*::
+      
+  1
     One or more errors were encountered while renaming.
-
-== EXAMPLES
-
-=== Matching against filenames
-
-Rename file01.txt and file2.txt to repl01.txt and repl2.txt:
-
-    mfr -m "file(%d+)" -r "repl%1" file01.txt file2.txt
-
-=== Matching against a source file
-
-Rename file01.txt and file2.txt to foo.txt and bar.txt:
-
-    echo "foo\\nbar" | mfr -s -m "file(%d+)" -r "^[^.+]" \
-        file01.txt file2.txt
-
-== SEE ALSO
-Lua pattern reference:
-
-    http://www.lua.org/manual/5.1/manual.html#5.4.1
+EXAMPLES
+  Matching against filenames
+    Rename file01.txt and file2.txt to repl01.txt and repl2.txt:
+  
+      mfr -m "file(%d+)" -r "repl%1" file01.txt file2.txt
+  
+  Matching against a source file
+    Rename file01.txt and file2.txt to foo.txt and bar.txt:
+  
+      echo "foo\\nbar" | mfr -s -m "file(%d+)" -r "^[^.+]" \
+          file01.txt file2.txt
+SEE ALSO
+  Lua pattern reference: http://www.lua.org/manual/5.1/manual.html#5.4.1
