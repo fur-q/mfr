@@ -29,7 +29,7 @@ See LICENSE.
 ## To do
 
 - `--lua-script` option for fancier replacements
-- Accept filenames on stdin
+- Line edit history
 - More comprehensive tests
 - Makefile install target
 - Find a way to avoid groff that isn't even worse than groff

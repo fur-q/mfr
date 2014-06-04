@@ -24,13 +24,20 @@ Report bugs at <http://github.com/fur-q/mfr>.
 
 local args, opts = parser:parse(arg)
 
+if not util.isatty(io.stdin) then
+    for l in io.stdin:lines() do
+        args[#args+1] = l
+    end
+    util.freopen("/dev/tty", "r", io.stdin)
+end
+
 if #args == 0 then
     parser:opterr("No filenames provided")
 end
 
 local R = renamer(unpack(args))
 if #R == 0 then
-    return 1
+    parser:opterr("No filenames provided")
 end
 
 local source
@@ -70,6 +77,8 @@ local function preview()
         return (not util.yesno("OK to rename?")) or nil
     end
 end
+
+local ok = true
 
 repeat
     ok = preview()

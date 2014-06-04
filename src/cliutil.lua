@@ -2,12 +2,26 @@ local ffi  = require "ffi"
 local util = require "util"
 
 ffi.cdef [[
+    struct FFILE;
+    typedef struct FFILE FILE;
+
+    int    fileno(FILE * stream);
     void   free(void * p);
+    FILE * freopen(const char *restrict filename, const char *restrict mode, FILE *restrict stream);
+    int    isatty(int fd);
     char * linenoise(const char * prompt);
     int    mfr_termwidth(void);
 ]]
 
 local M = {}
+
+M.isatty = function(fh)
+    return ffi.C.isatty(ffi.C.fileno(fh)) == 1
+end
+
+M.freopen = function(fn, mode, stream)
+    return ffi.C.freopen(fn, mode, stream)
+end
 
 M.pluralise = function(count, word)
     if count ~= 1 and word:sub(#word, #word) ~= "s" then
