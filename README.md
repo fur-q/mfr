@@ -28,7 +28,6 @@ See LICENSE.
 
 ## To do
 
-- `--lua-script` option for fancier replacements
 - Line edit history
 - More comprehensive tests
 - Makefile install target
