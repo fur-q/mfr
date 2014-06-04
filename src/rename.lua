@@ -24,7 +24,6 @@ M.loadsource = function(self, src)
     self.src = util.lines(src)
 end
 
--- FIXME source should be a param, or all the other shit should not be
 M.match = function(self)
     local count = 0
     local dupes = {}
@@ -80,7 +79,7 @@ end
 
 M.reset = function(self)
     self.patt = nil
-    self.repl = type(self.rep) ~= "string" and self.repl or nil
+    self.repl = type(self.repl) ~= "string" and self.repl or nil
 end
 
 return function(...)
