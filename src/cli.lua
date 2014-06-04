@@ -10,14 +10,19 @@ mfr %s
 Usage: %s [OPTION]... [FILE]...
 Batch rename files using Lua patterns.
 
-  -b, --break              stop processing after encountering an error
+  -c, --cautious           stop processing after encountering an error
   -e, --no-extensions      don't match against or modify file extensions
+  -l, --lua-script=[FILE]  replace using the lua script FILE (overrides -r)
   -m, --match=[PATTERN]    set filename match pattern
   -r, --replace=[STRING]   set filename replacement string
   -s, --source=[FILE]      match against lines from FILE instead of filenames
   -y, --yes                always answer yes at yes/no prompts
   -h, --help               show this help and exit
   -v, --version            show version information and exit
+
+If a pipe is connected to stdin, it is assumed to contain input filenames.
+
+See the manual for more information on using --lua-script and --source.
 
 Report bugs at <http://github.com/fur-q/mfr>.
 ]], MFR_VERSION, arg[0]))
@@ -40,57 +45,40 @@ if #R == 0 then
     parser:opterr("No filenames provided")
 end
 
-local source
+R.patt, R.repl = opts.match, opts.replace
+R.cautious, R.noexts = opts.cautious, opts.no_extensions 
 
-if opts.source == true then -- no filename provided; read from stdin
-    source = io.stdin:read("*a")
-elseif type(opts.source) == "string" then
-    local f, err = io.open(opts.source)
-    if not f then
-        local err = string.format("Source file not found: %s", opts.source)
-        parser:opterr(err)
+if opts.lua_script then
+    local scr, err = util.read_input(opts.lua_script)
+    if not scr then
+        parser.opterr(err)
     end
-    source = f:read("*a")
-    f:close()
+    local err = R:loadscript(scr)
+    if err then
+        parser.opterr(err)
+    end
 end
 
-R:set_source(source)
+if opts.source then
+    local src, err = util.read_input(opts.source)
+    if not src then
+        parser.opterr(err)
+    end
+    R:loadsource(src)
+end
 
 -- TODO default to the last pattern used
 
-local match, replace = opts.match, opts.replace
-
-local function preview()
-    match = match or util.prompt("Enter match pattern: ")
-    replace = replace or util.prompt("Enter replace pattern: ")
-    local count, err = R:match(match, replace, opts.no_extensions)
-    if count == 0 then
-        err = "Nothing to rename."
-    end
-    if err then
-        print(err)
-        return util.yesno("Retry?", true)
-    end
-    if not opts.yes then
-        util.printf("Matched %d %s:", util.pluralise(count, "file"))
-        util.preview(R) 
-        return (not util.yesno("OK to rename?")) or nil
-    end
-end
-
-local ok = true
-
 repeat
-    ok = preview()
+    local ok = util.preview(R, opts.yes)
     if ok == true then -- retry
-        match, replace = nil, nil
-    end
-    if ok == false then -- quit
+        R:reset()
+    elseif ok == false then -- quit
         return 1 
     end
 until ok == nil
 
-if R:rename(opts["break"]) then
+if R:rename() then
     print("Done with no errors.")
     return 0
 end

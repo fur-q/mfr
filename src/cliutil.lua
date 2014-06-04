@@ -49,6 +49,21 @@ M.promptf = function(fmt, ...)
     return M.prompt(string.format(fmt, ...))
 end
 
+M.read_input = function(opt)
+    local out
+    if opt == true then -- no filename provided; read from stdin
+        out = io.stdin:read("*a")
+    elseif type(opt) == "string" then
+        local f, err = io.open(opt)
+        if not f then
+            return nil, string.format("File not found: %s", opt)
+        end
+        out = f:read("*a")
+        f:close()
+    end
+    return out
+end
+
 M.yesno = function(prompt, default)
     local ext = default == true and "Y/n" or "y/N"
     local out = M.promptf("%s (%s) ", prompt, ext)
@@ -64,11 +79,11 @@ end
 
 local min, max = math.min, math.max
 
-M.preview = function(rn)
+local listchanges = function(R)
     local width = termwidth() - 4
     local colmax = math.floor(width/2)
     local omax, nmax = 0, 0
-    for k, v in ipairs(rn) do
+    for k, v in ipairs(R) do
         if v.old then
             omax, nmax = max(omax, #v.old), max(nmax, #v.new)
         end
@@ -77,12 +92,30 @@ M.preview = function(rn)
     local fmt = string.format("%%-%d.%ds  %%-%d.%ds", omax, omax, nmax, nmax)
     M.printf(fmt, "Old name", "New name")
     print(string.rep("-", omax + nmax + 2))
-    for k, v in ipairs(rn) do
+    for k, v in ipairs(R) do
         if v.new then
             M.printf(fmt, util.basename(v.path), v.new)
         end
     end
     print()
+end
+
+M.preview = function(R, y)
+    R.patt = R.patt or M.prompt("Enter match pattern: ")
+    R.repl = R.repl or M.prompt("Enter replace pattern: ")
+    local count, err = R:match()
+    if count == 0 then
+        err = "Nothing to rename."
+    end
+    if err then
+        print(err)
+        return M.yesno("Retry?", true)
+    end
+    if not y then
+        M.printf("Matched %d %s:", M.pluralise(count, "file"))
+        listchanges(R) 
+        return (not M.yesno("OK to rename?")) or nil
+    end
 end
 
 return M

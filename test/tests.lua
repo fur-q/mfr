@@ -3,6 +3,14 @@ local util   = require "util"
 local test   = require "test"
 local files  = { "file1.lua", "file2.c", "file3.lua" }
 
+local testscript = [[
+local i = 0
+return function(s)
+    i = i + 1
+    return s .. i
+end
+]]
+
 local testpaths = {
     { "/usr/lib", "/usr", "lib" },
     { "/usr/",    "/",    "usr" },
@@ -25,7 +33,7 @@ util.is_file = function()
 end
 
 os.rename = function()
-    return MOCK_SUCCEED
+    return MOCK_SUCCEED, MOCK_SUCCEED or ";_;"
 end
 
 -- util tests
@@ -66,33 +74,45 @@ end
 
 test.match = function()
     R = rename(unpack(files))
-    local count, err = R:match("file(%d+).lua", "test%1.lua")
+    R.patt, R.repl = "file(%d+).lua", "test%1.lua"
+    local count, err = R:match()
     assert.equal(count, 2)
     assert.equal(R[1].new, "test1.lua")
     assert.equal(R[2].new, nil)
 end
 
 test.match_error = function()
-    local count, err = R:match("[[[", "")
+    R.patt, R.repl = "[[[", ""
+    local count, err = R:match()
     assert.equal(count, nil)
 end
 
 test.dupe_error = function()
-    local count, err = R:match(".+", "foo")
+    R.patt, R.repl = ".+", "foo"
+    local count, err = R:match()
     assert.equal(err, "Duplicate output filename: foo")
 end
 
 test.source = function()
-    R:set_source("foo\nbar")
-    local count, err = R:match("(.+)", "%1")
+    R:loadsource("foo\nbar")
+    R.patt, R.repl = "(.+)", "%1"
+    local count, err = R:match()
     assert.equal(count, 2)
     assert.equal(R[1].new, "foo")
     assert.equal(R[3], nil)
 end
 
 test.preserve = function()
-    local count, err = R:match("(.+)", "%1", true)
+    R.noexts = true
+    local count, err = R:match()
     assert.equal(R[1].new, "foo.lua")
+end
+
+test.script = function()
+    R:loadscript(testscript)
+    local count, err = R:match()
+    assert.equal(R[1].new, "foo1.lua")
+    assert.equal(R[2].new, "bar2.c")
 end
 
 -- FIXME test break_on_error
@@ -103,6 +123,10 @@ end
 test.rename_error = function()
     MOCK_SUCCEED = false
     assert.equal(R:rename(), false)
+end
+
+test.errors = function()
+    assert.equal(R[R.errors[1]].err, ";_;")
 end
 
 test()

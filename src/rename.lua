@@ -8,22 +8,39 @@ M.add = function(self, name)
     end
 end
 
-M.match = function(self, match, replace, preserve)
+M.loadscript = function(self, scr)
+    local fn, err = loadstring(scr)
+    if not fn then
+        return string.format("Error in Lua script: %s", err)
+    end
+    local rep = fn()
+    if type(rep) ~= "function" and type(rep) ~= "table" then
+        return "Error: Lua script must return a function or table"
+    end
+    self.repl = rep
+end
+
+M.loadsource = function(self, src)
+    self.src = util.lines(src)
+end
+
+-- FIXME source should be a param, or all the other shit should not be
+M.match = function(self)
     local count = 0
     local dupes = {}
     for i, v in ipairs(self) do
-        -- stop processing when no source lines are left
-        if self.source and not self.source[i] then
+        -- stop processing when no self.src lines are left
+        if self.src and not self.src[i] then
             self[i] = nil
             goto skip
         end
         local old = util.basename(v.path)
         local ext
-        if preserve then
+        if self.noexts then
             old, ext = old:match("^(.-)%f[.%z]%.?([^.]*)$") -- thx mniip
         end
-        local src = self.source and self.source[i] or old
-        local ok, new = pcall(string.gsub, src, match, replace)
+        local src = self.src and self.src[i] or old
+        local ok, new = pcall(string.gsub, src, self.patt, self.repl)
         if not ok then -- pattern error
             return nil, "Pattern error: " .. new
         end
@@ -43,7 +60,7 @@ M.match = function(self, match, replace, preserve)
     return count
 end
 
-M.rename = function(self, stop)
+M.rename = function(self)
     local status = true
     for i, f in ipairs(self) do
         local ok, err = os.rename(f.path, util.join("/", util.dirname(f.path), f.new))
@@ -53,7 +70,7 @@ M.rename = function(self, stop)
         status = false
         f.err = err
         self.errors[#self.errors+1] = i
-        if stop then 
+        if self.cautious then 
             break
         end
         ::skip::
@@ -61,12 +78,9 @@ M.rename = function(self, stop)
     return status
 end
 
-M.set_source = function(self, src)
-    if type(src) ~= "string" then return end
-    self.source = {}
-    for m in src:gmatch("[^\n]+") do
-        self.source[#self.source+1] = m
-    end
+M.reset = function(self)
+    self.patt = nil
+    self.repl = type(self.rep) ~= "string" and self.repl or nil
 end
 
 return function(...)

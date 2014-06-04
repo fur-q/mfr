@@ -33,4 +33,13 @@ M.join = function(sep, p1, p2)
     return p1 .. sep .. p2
 end
 
+M.lines = function(str)
+    if type(str) ~= "string" then return end
+    out = {}
+    for m in str:gmatch("[^\n]+") do
+        out[#out+1] = m
+    end
+    return out
+end
+
 return M
