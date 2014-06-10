@@ -14,7 +14,7 @@ int mfr_termwidth(void) {
     return w.ws_col;
 }
 
-void l_getargs(lua_State * L, int argc, const char ** argv) {
+static void l_getargs(lua_State * L, int argc, const char ** argv) {
     int i;
     lua_newtable(L);
     for (i = 0; i < argc; i++) {
@@ -24,7 +24,7 @@ void l_getargs(lua_State * L, int argc, const char ** argv) {
     lua_setglobal(L, "arg");
 }
 
-int l_require(lua_State * L, const char * k) {
+static int l_require(lua_State * L, const char * k) {
     lua_getglobal(L, "require");
     lua_pushstring(L, k);
     if (lua_pcall(L, 1, 1, 1)) {
@@ -33,7 +33,7 @@ int l_require(lua_State * L, const char * k) {
     return 0;
 }
 
-int l_traceback(lua_State * L) {
+static int l_traceback(lua_State * L) {
     const char * msg = lua_tostring(L, 1);
     if (!msg)
         return 0;

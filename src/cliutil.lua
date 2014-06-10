@@ -49,9 +49,10 @@ M.promptf = function(fmt, ...)
     return M.prompt(string.format(fmt, ...))
 end
 
-M.read_input = function(opt)
+M.read_input = function(opt, prompt)
     local out
     if opt == true then -- no filename provided; read from stdin
+        print(prompt)
         out = io.stdin:read("*a")
     elseif type(opt) == "string" then
         local f, err = io.open(opt)

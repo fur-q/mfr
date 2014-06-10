@@ -9,6 +9,7 @@ You will need:
 - GNU make
 - pkg-config
 - LuaJIT and its dev libraries/headers (`libluajit-5.1-dev` on Debian)
+- pod2man (if you care about having a man page)
 
 All other dependencies are bundled in `contrib/`.
 
@@ -16,7 +17,7 @@ Run `make` for a release build or `make debug` for a debug build.
 
 ## Usage
 
-See `mfr --help` or `man mfr`.
+See [the documentation](https://github.com/fur-q/mfr/doc/mfr.pod) or `mfr --help`.
 
 ## License
 
@@ -30,6 +31,4 @@ See LICENSE.
 
 - Line edit history
 - More comprehensive tests
-- Makefile install target
-- Find a way to avoid groff that isn't even worse than groff
 

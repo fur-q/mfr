@@ -11,11 +11,11 @@ Usage: %s [OPTION]... [FILE]...
 Batch rename files using Lua patterns.
 
   -c, --cautious           stop processing after encountering an error
-  -e, --no-extensions      don't match against or modify file extensions
   -l, --lua-script=[FILE]  replace using the lua script FILE (overrides -r)
   -m, --match=[PATTERN]    set filename match pattern
   -r, --replace=[STRING]   set filename replacement string
   -s, --source=[FILE]      match against lines from FILE instead of filenames
+  -x, --no-extensions      don't match against or modify file extensions
   -y, --yes                always answer yes at yes/no prompts
   -h, --help               show this help and exit
   -v, --version            show version information and exit
@@ -49,7 +49,7 @@ R.patt, R.repl = opts.match, opts.replace
 R.cautious, R.noexts = opts.cautious, opts.no_extensions 
 
 if opts.lua_script then
-    local scr, err = util.read_input(opts.lua_script)
+    local scr, err = util.read_input(opts.lua_script, "Enter Lua script:")
     if not scr then
         parser.opterr(err)
     end
@@ -60,7 +60,7 @@ if opts.lua_script then
 end
 
 if opts.source then
-    local src, err = util.read_input(opts.source)
+    local src, err = util.read_input(opts.source, "Enter source text:")
     if not src then
         parser.opterr(err)
     end
