@@ -76,7 +76,7 @@ Rename file01.txt and file2.txt to repl01.txt and repl2.txt:
 
 This can be expressed more concisely with --no-extensions:
 
- $ mfr -e -m "file(%d+)" -r "repl%1" file01.txt file2.txt
+ $ mfr -x -m "file(%d+)" -r "repl%1" file01.txt file2.txt
 
 =head2 Matching against a source file
 
@@ -85,7 +85,7 @@ Rename file01.txt and file2.txt to foo.txt and bar.txt:
  $ cat src.txt
  foo
  bar
- $ mfr -e -s src.txt -m "file(%d+)" -r "^[^.+]" file01.txt file2.txt
+ $ mfr -x -s src.txt -m "file(%d+)" -r "^[^.+]" file01.txt file2.txt
 
 =head2 Replacing using a Lua script
 
@@ -96,13 +96,13 @@ Rename file.lua and file.c to file01.lua and file02.c:
  return function(s)
     x = x + 1; return string.format("%s%02d", s, x)
  end
- $ mfr -e -l func.lua -m "file" file.lua file.c
+ $ mfr -x -l func.lua -m "file" file.lua file.c
 
 =head2 Providing filenames on standard input
 
 Sort some filenames by last modified date and rename them:
 
- $ ls -t | mfr -e -m "(.+)" -r "renamed_%1"
+ $ ls -t | mfr -x -m "(.+)" -r "renamed_%1"
 
 This is particularly useful in conjunction with --lua-script.
 
