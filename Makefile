@@ -31,4 +31,4 @@ test:
 	LUA_PATH=";;src/?.lua;contrib/?.lua" $(LJ) test/tests.lua
 
 clean:
-	-rm -f *.o mfr
+	-rm -f *.o mfr doc/mfr.1
