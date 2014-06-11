@@ -14,8 +14,6 @@ mfr batch renames files using Lua patterns.
 
 Replacement filenames may be derived from the original filenames, from lines in a text file specified by B<--source>, or from standard input.
 
-If standard input is not a TTY, it is assumed to contain a list of filenames. Other options which accept input on stdin must be entered interactively.
-
 =head1 OPTIONS
 
 =over 4
@@ -26,11 +24,9 @@ Abort when an error is encountered, exiting with status 1.
 
 =item B<-l, --lua-script=[FILE]>
 
-Path to a Lua script, which must return a table or a function.
+Path to a Lua script, which must return a table or a function. The returned value will be used as the final argument to B<string.gsub>.
 
-The returned value will be used as the final argument to string.gsub\() when matching against filenames.
-
-If the argument is "-", match against lines from standard input.
+Will be prompted for interactively if the argument is "-".
 
 =item B<-m, --match=[PATTERN]>
 
@@ -48,7 +44,7 @@ Will be ignored if B<--lua-script> is specified. Will be prompted for if not spe
 
 Match against lines from FILE instead of the original filenames. If there are fewer lines in FILE than filenames, stop matching when there are no lines left.
 
-If the argument is "-", match against lines from standard input.
+Will be prompted for interactively if the argument is "-".
 
 =item B<-x, --no-extensions>
 
@@ -60,51 +56,59 @@ Always answer yes at yes/no prompts.
 
 =back
 
-=head1 EXIT STATUS
-
-0: All files were renamed correctly.
-
-1: One or more errors were encountered while renaming.
-
 =head1 EXAMPLES
 
 =head2 Matching against filenames
 
-Rename file01.txt and file2.txt to repl01.txt and repl2.txt:
+Rename I<file01.txt> and I<file2.txt> to I<repl01.txt> and I<repl2.txt>:
 
  $ mfr -m "file(%d+).txt" -r "repl%1.txt" file01.txt file2.txt
 
-This can be expressed more concisely with --no-extensions:
+This can be expressed more concisely with B<--no-extensions>:
 
- $ mfr -x -m "file(%d+)" -r "repl%1" file01.txt file2.txt
+ $ mfr -e -m "file(%d+)" -r "repl%1" file01.txt file2.txt
 
 =head2 Matching against a source file
 
-Rename file01.txt and file2.txt to foo.txt and bar.txt:
+Rename I<file01.txt> and I<file2.txt> to I<foo.txt> and I<bar.txt>:
 
  $ cat src.txt
  foo
  bar
- $ mfr -x -s src.txt -m "file(%d+)" -r "^[^.+]" file01.txt file2.txt
+ $ mfr -e -s src.txt -m "file(%d+)" -r "^[^.+]" file01.txt file2.txt
 
 =head2 Replacing using a Lua script
 
-Rename file.lua and file.c to file01.lua and file02.c:
+Rename I<file.lua> and I<file.c> to I<file01.lua> and I<file02.c>:
 
  $ cat func.lua
  local x = 0
  return function(s)
     x = x + 1; return string.format("%s%02d", s, x)
  end
- $ mfr -x -l func.lua -m "file" file.lua file.c
+ $ mfr -e -l func.lua -m "file" file.lua file.c
 
 =head2 Providing filenames on standard input
 
 Sort some filenames by last modified date and rename them:
 
- $ ls -t | mfr -x -m "(.+)" -r "renamed_%1"
+ $ ls -t | mfr -e -m "(.+)" -r "renamed_%1"
 
-This is particularly useful in conjunction with --lua-script.
+This is particularly useful in conjunction with B<--lua-script>.
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item B<0>
+
+All files were renamed correctly.
+
+=item B<1>
+
+One or more errors were encountered while renaming.
+
+=back
 
 =head1 SEE ALSO
 
