@@ -12,12 +12,12 @@ Bread-and-butter usage:
 
 You're right, that does look boring. Here's something more exciting:
 
-    $ cat bar01.lua
+    $ cat bar1.lua
     return function(n)
         n = tonumber(n) * 2
         return string.format("foo%s%02d", s, n)
     end
-    $ mfr -x -l bar01.lua "(.+)(%d+)$" bar1.lua bar02.c
+    $ mfr -x -l bar1.lua "(.+)(%d+)$" bar1.lua bar02.c
     $ ls
     foobar02.lua foobar04.c
 
