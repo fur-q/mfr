@@ -17,7 +17,7 @@ Run `make` for a release build or `make debug` for a debug build.
 
 ## Usage
 
-See [the documentation](https://github.com/fur-q/mfr/doc/mfr.pod) or `mfr --help`.
+See [the documentation](https://github.com/fur-q/mfr/blob/master/doc/mfr.pod) or `mfr --help`.
 
 ## License
 

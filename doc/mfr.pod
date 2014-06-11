@@ -84,7 +84,8 @@ Rename I<file.lua> and I<file.c> to I<file01.lua> and I<file02.c>:
  $ cat func.lua
  local x = 0
  return function(s)
-    x = x + 1; return string.format("%s%02d", s, x)
+    x = x + 1
+    return string.format("%s%02d", s, x)
  end
  $ mfr -x -l func.lua -m "file" file.lua file.c
 
