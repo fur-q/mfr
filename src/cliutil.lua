@@ -74,22 +74,26 @@ M.yesno = function(prompt, default)
     return not not out:match("^[yY]")
 end
 
-local termwidth = function()
+termwidth = function()
     return ffi.C.mfr_termwidth()
 end
 
 local min, max = math.min, math.max
 
-local listchanges = function(R)
+local colwidth = function(R)
     local width = termwidth() - 4
     local colmax = math.floor(width/2)
-    local omax, nmax = 0, 0
+    local omax, nmax = 16, 16 -- minimum widths
     for k, v in ipairs(R) do
-        if v.old then
-            omax, nmax = max(omax, #v.old), max(nmax, #v.new)
+        if v.new then
+            omax, nmax = max(omax, #util.basename(v.path)), max(nmax, #v.new)
         end
     end
-    omax, nmax = max(16, min(omax, colmax)), max(16, min(nmax, colmax))
+    return min(omax, colmax), min(nmax, colmax)
+end
+
+local listchanges = function(R)
+    local omax, nmax = colwidth(R)
     local fmt = string.format("%%-%d.%ds  %%-%d.%ds", omax, omax, nmax, nmax)
     M.printf(fmt, "Old name", "New name")
     print(string.rep("-", omax + nmax + 2))

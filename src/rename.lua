@@ -30,7 +30,7 @@ M.match = function(self)
     for i, v in ipairs(self) do
         -- stop processing when no self.src lines are left
         if self.src and not self.src[i] then
-            self[i] = nil
+            v.new = nil
             goto skip
         end
         local old = util.basename(v.path)
@@ -43,17 +43,20 @@ M.match = function(self)
         if not ok then -- pattern error
             return nil, "Pattern error: " .. new
         end
-        new = util.join(".", new, ext)
-        if old ~= new then
-            if dupes[new] then
-                return nil, "Duplicate output filename: " .. new
-            end
-            dupes[new] = true
-            v.new = new
-            count = count + 1
-        else
-            v.new, v.ext = nil, nil
+        if not new then -- no match
+            goto skip
         end
+        new = util.join(".", new, ext)
+        if dupes[new] then
+            return nil, "Duplicate output filename: " .. new
+        end
+        if util.join(".", old, ext) == new then
+            v.new = nil            
+            goto skip
+        end
+        dupes[new] = true
+        v.new = new
+        count = count + 1
         ::skip::
     end
     return count
@@ -61,13 +64,16 @@ end
 
 M.rename = function(self)
     local status = true
-    for i, f in ipairs(self) do
-        local ok, err = os.rename(f.path, util.join("/", util.dirname(f.path), f.new))
+    for i, v in ipairs(self) do
+        if not v.new then
+            goto skip
+        end
+        local ok, err = os.rename(v.path, util.join("/", util.dirname(v.path), v.new))
         if ok then 
             goto skip
         end
         status = false
-        f.err = err
+        v.err = err
         self.errors[#self.errors+1] = i
         if self.cautious then 
             break

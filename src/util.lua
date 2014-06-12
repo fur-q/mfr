@@ -27,7 +27,7 @@ M.is_file = function(path)
 end
 
 M.join = function(sep, p1, p2)
-    if not p2 then
+    if (not p2) or #p2 == 0 then
         return p1
     end
     return p1 .. sep .. p2
