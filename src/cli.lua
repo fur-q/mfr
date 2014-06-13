@@ -1,10 +1,12 @@
-local optparse = require "optparse"
-local renamer  = require "rename"
-local util     = require "cliutil"
+local optparse = require "mfr_internal.optparse"
+local renamer  = require "mfr_internal.rename"
+local util     = require "mfr_internal.cliutil"
 
-local MFR_VERSION = "0.5.0"
+local stdin, ipairs, print, sformat = io.stdin, ipairs, print, string.format
 
-local parser = optparse(string.format([[
+local MFR_VERSION = "0.9.0"
+
+local parser = optparse(sformat([[
 mfr %s
 
 Usage: %s [OPTION]... [FILE]...
@@ -29,11 +31,11 @@ Report bugs at <http://github.com/fur-q/mfr>.
 
 local args, opts = parser:parse(arg)
 
-if not util.isatty(io.stdin) then
-    for l in io.stdin:lines() do
+if not util.isatty(stdin) then
+    for l in stdin:lines() do
         args[#args+1] = l
     end
-    util.freopen("/dev/tty", "r", io.stdin)
+    util.freopen("/dev/tty", "r", stdin)
 end
 
 if #args == 0 then
@@ -83,7 +85,7 @@ if R:rename() then
     return 0
 end
 
-local prompt = string.format("Done with %d errors. Show errors?", #R.errors)
+local prompt = sformat("Done with %d errors. Show errors?", #R.errors)
 if util.yesno(prompt, true) then
     for _, i in ipairs(R.errors) do
         local f = R[i]

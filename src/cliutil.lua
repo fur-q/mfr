@@ -1,5 +1,11 @@
 local ffi  = require "ffi"
-local util = require "util"
+local util = require "mfr_internal.util"
+
+local open, stdin = io.open, io.stdin
+local floor, min, max = math.floor, math.min, math.max
+local exit = os.exit
+local sformat, srep = string.format, string.rep
+local ipairs, print, type = ipairs, print, type
 
 ffi.cdef [[
     struct FFILE;
@@ -31,7 +37,7 @@ M.pluralise = function(count, word)
 end
 
 M.printf = function(fmt, ...)
-    print(string.format(fmt, ...))
+    print(sformat(fmt, ...))
 end
 
 M.prompt = function(prompt)
@@ -41,23 +47,23 @@ M.prompt = function(prompt)
         ffi.C.free(str)
         return out
     else -- assume ^C was pressed and die gracefully
-        os.exit(1)
+        exit(1)
     end
 end
 
 M.promptf = function(fmt, ...)
-    return M.prompt(string.format(fmt, ...))
+    return M.prompt(sformat(fmt, ...))
 end
 
 M.read_input = function(opt, prompt)
     local out
     if opt == true then -- no filename provided; read from stdin
         print(prompt)
-        out = io.stdin:read("*a")
+        out = stdin:read("*a")
     elseif type(opt) == "string" then
-        local f, err = io.open(opt)
+        local f, err = open(opt)
         if not f then
-            return nil, string.format("File not found: %s", opt)
+            return nil, sformat("File not found: %s", opt)
         end
         out = f:read("*a")
         f:close()
@@ -74,15 +80,13 @@ M.yesno = function(prompt, default)
     return not not out:match("^[yY]")
 end
 
-termwidth = function()
+local termwidth = function()
     return ffi.C.mfr_termwidth()
 end
 
-local min, max = math.min, math.max
-
 local colwidth = function(R)
     local width = termwidth() - 4
-    local colmax = math.floor(width/2)
+    local colmax = floor(width/2)
     local omax, nmax = 16, 16 -- minimum widths
     for k, v in ipairs(R) do
         if v.new then
@@ -94,9 +98,9 @@ end
 
 local listchanges = function(R)
     local omax, nmax = colwidth(R)
-    local fmt = string.format("%%-%d.%ds  %%-%d.%ds", omax, omax, nmax, nmax)
+    local fmt = sformat("%%-%d.%ds  %%-%d.%ds", omax, omax, nmax, nmax)
     M.printf(fmt, "Old name", "New name")
-    print(string.rep("-", omax + nmax + 2))
+    print(srep("-", omax + nmax + 2))
     for k, v in ipairs(R) do
         if v.new then
             M.printf(fmt, util.basename(v.path), v.new)

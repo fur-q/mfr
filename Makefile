@@ -18,7 +18,7 @@ mfr: cli.o linenoise.o util.o cli.l.o cliutil.l.o rename.l.o util.l.o optparse.l
 	$(CC) $(LDFLAGS) -o $@ $^
 
 %.l.o: %.lua
-	$(LUA) -bg $^ $@
+	$(LUA) -b -n mfr_internal.$(basename $(notdir $^)) $^ $@
 
 doc/mfr.1: doc/mfr.pod
 	pod2man -c "" -n MFR -r "" -s 1 $^ $@
@@ -28,7 +28,7 @@ install: mfr doc/mfr.1
 	-install doc/mfr.1 $(MANDIR)/man1
 
 test: 
-	LUA_PATH=";;src/?.lua;contrib/?.lua" $(LJ) test/tests.lua
+	LUA_PATH=";;src/?.lua;contrib/?.lua" $(LUA) test/tests.lua
 
 clean:
 	-rm -f *.o mfr doc/mfr.1

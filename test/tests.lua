@@ -99,7 +99,7 @@ test.source = function()
     local count, err = R:match()
     assert.equal(count, 2)
     assert.equal(R[1].new, "foo")
-    assert.equal(R[3], nil)
+    assert.equal(R[3].new, nil)
 end
 
 test.preserve = function()

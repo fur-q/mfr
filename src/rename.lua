@@ -1,4 +1,8 @@
-local util = require "util"
+local util = require "mfr_internal.util"  -- FIXME this breaks testing
+
+local sformat, sgsub = string.format, string.gsub
+local rename = os.rename 
+local ipairs, pcall, setmetatable, select, type = ipairs, pcall, setmetatable, select, type
 
 local M = {}
 
@@ -11,7 +15,7 @@ end
 M.loadscript = function(self, scr)
     local fn, err = loadstring(scr)
     if not fn then
-        return string.format("Error in Lua script: %s", err)
+        return sformat("Error in Lua script: %s", err)
     end
     local rep = fn()
     if type(rep) ~= "function" and type(rep) ~= "table" then
@@ -33,30 +37,24 @@ M.match = function(self)
             v.new = nil
             goto skip
         end
-        local old = util.basename(v.path)
-        local ext
+        local old, ext = util.basename(v.path), nil
         if self.noexts then
             old, ext = old:match("^(.-)%f[.%z]%.?([^.]*)$") -- thx mniip
         end
         local src = self.src and self.src[i] or old
-        local ok, new = pcall(string.gsub, src, self.patt, self.repl)
+        local ok, new = pcall(sgsub, src, self.patt, self.repl)
         if not ok then -- pattern error
             return nil, "Pattern error: " .. new
         end
-        if not new then -- no match
+        if (not new) or old == new then
             goto skip
         end
-        new = util.join(".", new, ext)
         if dupes[new] then
             return nil, "Duplicate output filename: " .. new
         end
-        if util.join(".", old, ext) == new then
-            v.new = nil            
-            goto skip
-        end
-        dupes[new] = true
-        v.new = new
         count = count + 1
+        dupes[new] = true
+        v.new = util.join(".", new, ext)
         ::skip::
     end
     return count
