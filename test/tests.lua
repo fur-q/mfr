@@ -1,6 +1,6 @@
-local rename = require "rename"
-local util   = require "util"
-local test   = require "test"
+local rename = require "src.rename"
+local util   = require "src.util"
+local test   = require "contrib.test"
 local files  = { "file1.lua", "file2.c", "file3.lua" }
 
 local testscript = [[

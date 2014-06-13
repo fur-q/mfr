@@ -1,6 +1,6 @@
-local optparse = require "mfr_internal.optparse"
-local renamer  = require "mfr_internal.rename"
-local util     = require "mfr_internal.cliutil"
+local optparse = require "src.optparse"
+local renamer  = require "src.rename"
+local util     = require "src.cliutil"
 
 local stdin, ipairs, print, sformat = io.stdin, ipairs, print, string.format
 

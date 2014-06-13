@@ -1,5 +1,5 @@
 local ffi  = require "ffi"
-local util = require "mfr_internal.util"
+local util = require "src.util"
 
 local open, stdin = io.open, io.stdin
 local floor, min, max = math.floor, math.min, math.max

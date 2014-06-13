@@ -1,4 +1,4 @@
-local util = require "mfr_internal.util"  -- FIXME this breaks testing
+local util = require "src.util"
 
 local sformat, sgsub = string.format, string.gsub
 local rename = os.rename 

@@ -48,7 +48,7 @@ int main(int argc, const char ** argv) {
     luaL_openlibs(L);
     lua_pushcfunction(L, l_traceback);
     l_getargs(L, argc, argv);
-    if (l_require(L, "mfr_internal.cli"))
+    if (l_require(L, "src.cli"))
         DIE(lua_tostring(L, -1));
     lua_close(L);
     return 0;
